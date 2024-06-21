@@ -52,14 +52,6 @@ module Brcobranca
 
         private
 
-        def monta_logotipo(doc, boleto, x, y, scale)
-          doc.graphic do |g|
-            g.scale(scale, scale)
-            fator = 1 / scale
-            g.image boleto.logotipo, x: (x * fator), y: (y * fator)
-          end
-        end
-
         # Retorna um stream pronto para gravação em arquivo.
         #
         # @return [Stream]
@@ -70,7 +62,7 @@ module Brcobranca
         def modelo_generico(boleto, options = {})
           doc = Document.new paper: :A4 # 210x297
 
-          template_path = File.join(File.dirname(__FILE__), '..', '..', 'arquivos', 'templates', 'modelo_generico3.eps')
+          template_path = File.join(File.dirname(__FILE__), '..', '..', 'arquivos', 'templates', 'modelo_praso.eps')
 
           raise 'Não foi possível encontrar o template. Verifique o caminho' unless File.exist?(template_path)
 
@@ -154,7 +146,11 @@ module Brcobranca
             doc.show boleto.sacado_endereco[:nome_logradouro], tag: :pequeno
 
             move_more(doc, 0, -0.45)
-            doc.show "#{boleto.sacado_endereco[:nome_bairro]} - #{boleto.sacado_endereco[:nome_cidade]}/#{boleto.sacado_endereco[:sigla_UF]}", tag: :pequeno
+            sacado_endereco_completo = "#{boleto.sacado_endereco[:nome_bairro]} -" \
+                                       "#{boleto.sacado_endereco[:nome_cidade]}/" \
+                                       "#{boleto.sacado_endereco[:sigla_UF]}"
+
+            doc.show sacado_endereco_completo, tag: :pequeno
 
             move_more(doc, 0, -0.45)
             doc.show boleto.sacado_endereco[:numero_CEP].to_br_cep, tag: :pequeno
@@ -165,7 +161,6 @@ module Brcobranca
 
           move_more(doc, 9.4, 0)
           doc.show boleto.data_vencimento.to_s_br, tag: :grande_bold
-
           # FIM Primeira parte do BOLETO
         end
 
@@ -257,10 +252,23 @@ module Brcobranca
 
           if boleto.sacado_endereco
             move_more(doc, 0, -0.3)
-            doc.show "#{boleto.sacado_endereco[:nome_logradouro]} - #{boleto.sacado_endereco[:nome_bairro]} - #{boleto.sacado_endereco[:nome_cidade]}/#{boleto.sacado_endereco[:sigla_UF]}, #{boleto.sacado_endereco[:numero_CEP].to_br_cep}", tag: :menor
-          end
+            sacado_endereco_completo = "#{boleto.sacado_endereco[:nome_logradouro]} - " \
+                                       "#{boleto.sacado_endereco[:nome_bairro]} - " \
+                                       "#{boleto.sacado_endereco[:nome_cidade]}/" \
+                                       "#{boleto.sacado_endereco[:sigla_UF]}, " \
+                                       "#{boleto.sacado_endereco[:numero_CEP].to_br_cep}"
 
+            doc.show sacado_endereco_completo, tag: :menor
+          end
           # FIM Segunda parte do BOLETO
+        end
+
+        def monta_logotipo(doc, boleto, x, y, scale)
+          doc.graphic do |g|
+            g.scale(scale, scale)
+            fator = 1 / scale
+            g.image boleto.logotipo, x: (x * fator), y: (y * fator)
+          end
         end
       end
     end
