@@ -195,10 +195,10 @@ module Brcobranca
           move_more(doc, -14.7, -1)
           doc.show boleto.data_documento.to_s_br, tag: :menor_bold if boleto.data_documento
 
-          move_more(doc, 3.65, 0)
+          move_more(doc, 1.7, 0)
           doc.show boleto.documento_numero, tag: :menor_bold
 
-          move_more(doc, 2.4, 0)
+          move_more(doc, 4.35, 0)
           doc.show boleto.especie_documento, tag: :menor_bold
 
           move_more(doc, 1.9, 0)
